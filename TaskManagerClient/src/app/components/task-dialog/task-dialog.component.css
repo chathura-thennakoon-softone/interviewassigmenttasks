@@ -1,0 +1,97 @@
+.task-dialog {
+  min-width: 500px;
+}
+
+h2[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row mat-form-field {
+  flex: 1;
+}
+
+.form-row mat-form-field:first-child {
+  flex: 2;
+}
+
+.priority-option, .status-option {
+  display: flex;
+  align-items: center;
+}
+
+.priority-option.low {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.priority-option.medium {
+  color: #ff9800;
+  font-weight: 500;
+}
+
+.priority-option.high {
+  color: #f44336;
+  font-weight: 500;
+}
+
+.status-option.active {
+  color: #2196f3;
+  font-weight: 500;
+}
+
+.status-option.completed {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+mat-dialog-actions {
+  padding: 16px 0 0 0;
+  margin: 0;
+}
+
+mat-dialog-actions button {
+  margin-left: 8px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .task-dialog {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+}

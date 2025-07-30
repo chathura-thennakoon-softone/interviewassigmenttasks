@@ -1,0 +1,329 @@
+TASK MANAGER API - FRONTEND DEVELOPER GUIDE
+===========================================
+
+PROJECT OVERVIEW
+-----------------
+This is a Task Management REST API built with .NET 8 that provides user authentication and complete task management functionality. The API uses Basic HTTP Authentication and Entity Framework Core with SQL Server.
+
+AUTHENTICATION METHOD
+----------------------
+IMPORTANT: This API uses Basic HTTP Authentication, not JWT tokens. For every authenticated request, you need to include:
+
+Authorization: Basic <base64-encoded-credentials>
+
+Where <base64-encoded-credentials> is username:password encoded in Base64.
+
+API BASE URL
+------------
+Development: https://localhost:7219 (HTTPS)
+The API supports CORS for all origins, methods, and headers
+
+API ENDPOINTS
+=============
+
+AUTHENTICATION ENDPOINTS (No Auth Required)
+--------------------------------------------
+
+1. Register User
+POST /api/auth/register
+Content-Type: application/json
+
+Request Body:
+{
+  "username": "string",      // Required, max 50 chars
+  "email": "string",         // Required, valid email, max 100 chars  
+  "password": "string"       // Required, min 6 chars, max 100 chars
+}
+
+Success Response (200):
+{
+  "message": "User registered successfully",
+  "user": {
+    "id": 1,
+    "username": "testuser",
+    "email": "test@example.com",
+    "createdAt": "2025-07-19T10:30:00Z"
+  }
+}
+
+Error Response (400):
+{
+  "message": "User with this username or email already exists"
+}
+
+2. Login User
+POST /api/auth/login
+Content-Type: application/json
+
+Request Body:
+{
+  "username": "string",      // Required
+  "password": "string"       // Required
+}
+
+Success Response (200):
+{
+  "message": "Login successful",
+  "user": {
+    "id": 1,
+    "username": "testuser", 
+    "email": "test@example.com",
+    "createdAt": "2025-07-19T10:30:00Z"
+  }
+}
+
+Error Response (401):
+{
+  "message": "Invalid username or password"
+}
+
+TASK MANAGEMENT ENDPOINTS (Requires Authentication)
+---------------------------------------------------
+All task endpoints require Basic Authentication header!
+
+3. Get All User Tasks
+GET /api/tasks
+Authorization: Basic <credentials>
+
+Optional Query Parameters:
+- sortBy: Sort by field (e.g., "priority", "dueDate", "createdAt")
+- priority: Filter by priority (1=Low, 2=Medium, 3=High)
+- isCompleted: Filter by completion status (true/false)
+
+Example:
+GET /api/tasks?sortBy=priority&priority=3&isCompleted=false
+
+Success Response (200):
+[
+  {
+    "id": 1,
+    "title": "Complete project",
+    "description": "Finish the task manager project",
+    "isCompleted": false,
+    "priority": 3,                    // 1=Low, 2=Medium, 3=High
+    "createdAt": "2025-07-19T10:30:00Z",
+    "dueDate": "2025-07-25T10:00:00Z",
+    "completedAt": null,
+    "userId": 1
+  }
+]
+
+4. Get Specific Task
+GET /api/tasks/{id}
+Authorization: Basic <credentials>
+
+Success Response (200): Same as task object above
+Error Response (404):
+{
+  "message": "Task not found"
+}
+
+5. Create New Task
+POST /api/tasks
+Content-Type: application/json
+Authorization: Basic <credentials>
+
+Request Body:
+{
+  "title": "string",           // Required, max 200 chars
+  "description": "string",     // Optional, max 1000 chars
+  "priority": 2,               // Optional, 1=Low, 2=Medium, 3=High (default: Medium)
+  "dueDate": "2025-07-25T10:00:00Z"  // Optional, ISO 8601 format
+}
+
+Success Response (201): Returns created task object
+
+6. Update Task
+PUT /api/tasks/{id}
+Content-Type: application/json
+Authorization: Basic <credentials>
+
+Request Body:
+{
+  "title": "string",           // Required, max 200 chars
+  "description": "string",     // Optional, max 1000 chars
+  "isCompleted": false,        // Required
+  "priority": 2,               // Required, 1=Low, 2=Medium, 3=High
+  "dueDate": "2025-07-25T10:00:00Z"  // Optional
+}
+
+Success Response (200): Returns updated task object
+Error Response (404): Task not found
+
+7. Toggle Task Completion
+PATCH /api/tasks/{id}/toggle
+Authorization: Basic <credentials>
+
+This endpoint toggles the completion status and automatically sets/clears the completedAt timestamp.
+
+Success Response (200): Returns updated task object
+
+8. Delete Task
+DELETE /api/tasks/{id}
+Authorization: Basic <credentials>
+
+Success Response (200):
+{
+  "message": "Task deleted successfully"
+}
+
+DATA MODELS
+===========
+
+Priority Levels:
+Low: 1
+Medium: 2
+High: 3
+
+Task Object Structure:
+{
+  id: number,
+  title: string,
+  description: string | null,
+  isCompleted: boolean,
+  priority: number,          // 1, 2, or 3
+  createdAt: string,         // ISO 8601 date string
+  dueDate: string | null,    // ISO 8601 date string
+  completedAt: string | null, // ISO 8601 date string
+  userId: number
+}
+
+User Object Structure:
+{
+  id: number,
+  username: string,
+  email: string,
+  createdAt: string         // ISO 8601 date string
+}
+
+FRONTEND IMPLEMENTATION GUIDELINES
+===================================
+
+1. Authentication Flow
+- Registration/Login: Store user credentials securely (consider localStorage/sessionStorage)
+- Basic Auth: For each API call, encode username:password in Base64
+- Auth Header: Include Authorization: Basic <encoded-credentials> in all task requests
+
+2. Authentication Helper (JavaScript Example)
+// Create Basic Auth header
+function createAuthHeader(username, password) {
+  const credentials = btoa(`${username}:${password}`);
+  return `Basic ${credentials}`;
+}
+
+// API call example
+async function fetchTasks(username, password) {
+  const response = await fetch('/api/tasks', {
+    headers: {
+      'Authorization': createAuthHeader(username, password),
+      'Content-Type': 'application/json'
+    }
+  });
+  return response.json();
+}
+
+3. Error Handling
+- 401 Unauthorized: Invalid credentials - redirect to login
+- 404 Not Found: Resource doesn't exist
+- 400 Bad Request: Validation errors - show field-specific messages
+
+4. Task Management Features to Implement
+- User registration and login forms
+- Task list with filtering (priority, completion status)
+- Task sorting options
+- Create/edit task forms with validation
+- Task completion toggle
+- Task deletion with confirmation
+- Due date management
+- Priority level indicators (Low/Medium/High)
+
+5. UI/UX Recommendations
+- Priority Colors: Use different colors for Low (green), Medium (yellow), High (red)
+- Due Date Alerts: Highlight overdue tasks
+- Completion Status: Visual indicators for completed tasks
+- Filtering UI: Dropdowns or tabs for priority and completion filters
+- Sorting Options: Dropdown to sort by priority, due date, or creation date
+
+6. Date Handling
+- All dates are in UTC ISO 8601 format
+- Convert to local time zone in frontend
+- Use date picker components for due dates
+
+7. Validation Rules
+- Username: Required, max 50 characters
+- Email: Required, valid email format, max 100 characters
+- Password: Required, minimum 6 characters, max 100 characters
+- Task Title: Required, max 200 characters
+- Task Description: Optional, max 1000 characters
+
+EXAMPLE API REQUESTS
+====================
+
+Register User:
+POST https://localhost:7219/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+Login:
+POST https://localhost:7219/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123"
+}
+
+Get Tasks (with auth):
+GET https://localhost:7219/api/tasks
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=
+
+Create Task (with auth):
+POST https://localhost:7219/api/tasks
+Content-Type: application/json
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=
+
+{
+  "title": "Complete project documentation",
+  "description": "Write comprehensive documentation for the task manager API",
+  "priority": 2,
+  "dueDate": "2025-07-25T10:00:00Z"
+}
+
+Filter Tasks (with auth):
+GET https://localhost:7219/api/tasks?sortBy=priority&priority=2&isCompleted=false
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=
+
+Update Task (with auth):
+PUT https://localhost:7219/api/tasks/1
+Content-Type: application/json
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=
+
+{
+  "title": "Complete project documentation - Updated",
+  "description": "Write comprehensive documentation for the task manager API with examples",
+  "isCompleted": false,
+  "priority": 3,
+  "dueDate": "2025-07-26T10:00:00Z"
+}
+
+Toggle Task Completion (with auth):
+PATCH https://localhost:7219/api/tasks/1/toggle
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=
+
+Delete Task (with auth):
+DELETE https://localhost:7219/api/tasks/1
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=
+
+IMPORTANT NOTES
+===============
+- This API provides a complete task management system with user isolation (users only see their own tasks)
+- The Basic Authentication approach makes it simple to integrate with any frontend framework
+- All authenticated endpoints require the Authorization header with Basic auth
+- The API automatically handles CORS, so frontend can make requests from any origin
+- Database is automatically created and migrated when the API starts
+- Users can only access their own tasks (enforced by the API)

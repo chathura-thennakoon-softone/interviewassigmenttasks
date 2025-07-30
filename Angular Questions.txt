@@ -1,0 +1,29 @@
+Angular Questions
+
+basic Task Detail
+what are the other life cycle methods apart from ngOnInit
+what life cycle is used to track the input parameter
+ngOnInit vs constructor
+readonly warning
+how to handle a error from a backend service
+
+
+routing
+need to load TaskList component with the route task-list under header and navigation 
+need to load taskDeail componet with both task-list/:id task-detail/:id 
+
+forms
+make title required
+patchValue vs setValue
+disable all form fields if task is completed
+how to track changes in form fields
+
+
+
+services and data sharing
+how to register a service as a provider in the application.
+subjects / behaviour subjects
+
+
+
+

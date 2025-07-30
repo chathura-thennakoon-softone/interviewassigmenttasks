@@ -1,0 +1,42 @@
+<div *ngIf="task">
+
+    <div>
+        <span>Title</span>
+        <p>{{task.title}}</p>
+    </div>
+
+    <div>
+        <span>Description</span>
+        <p>{{task.description}}</p>
+    </div>
+
+    <div class="form-row">
+        <div appearance="outline">
+            <span>Priority</span>
+            <p>{{ getPriorityLabel(task.priority) }}</p>
+        </div>
+
+        <div appearance="outline">
+            <span>Status</span>
+            <span
+                *ngIf="!task.isCompleted"
+                class="status-option active"
+            >Active</span>
+            <span
+                *ngIf="task.isCompleted"
+                class="status-option completed"
+            >Completed</span>
+
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div appearance="outline">
+            <span>Due Date</span>
+            <p>{{ task.dueDate | date: 'shortDate' }}</p>
+        </div>
+
+
+    </div>
+
+</div>

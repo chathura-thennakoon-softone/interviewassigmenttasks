@@ -1,0 +1,80 @@
+### Task Manager API Tests
+
+# Register a new user
+POST https://localhost:7219/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+###
+
+# Login (get user info)
+POST https://localhost:7219/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123"
+}
+
+###
+
+# Get all tasks (requires basic auth)
+GET https://localhost:7219/api/tasks
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=
+
+###
+
+# Create a new task (requires basic auth)
+POST https://localhost:7219/api/tasks
+Content-Type: application/json
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=
+
+{
+  "title": "Complete project documentation",
+  "description": "Write comprehensive documentation for the task manager API",
+  "priority": 2,
+  "dueDate": "2025-07-25T10:00:00Z"
+}
+
+###
+
+# Get tasks with filtering (requires basic auth)
+GET https://localhost:7219/api/tasks?sortBy=priority&priority=2&isCompleted=false
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=
+
+###
+
+# Update a task (requires basic auth) - replace {id} with actual task ID
+PUT https://localhost:7219/api/tasks/1
+Content-Type: application/json
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=
+
+{
+  "title": "Complete project documentation - Updated",
+  "description": "Write comprehensive documentation for the task manager API with examples",
+  "isCompleted": false,
+  "priority": 3,
+  "dueDate": "2025-07-26T10:00:00Z"
+}
+
+###
+
+# Toggle task completion (requires basic auth) - replace {id} with actual task ID
+PATCH https://localhost:7219/api/tasks/1/toggle
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=
+
+###
+
+# Delete a task (requires basic auth) - replace {id} with actual task ID
+DELETE https://localhost:7219/api/tasks/1
+Authorization: Basic dGVzdHVzZXI6cGFzc3dvcmQxMjM=anagerAPI_HostAddress = http://localhost:5069
+
+GET {{TaskManagerAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

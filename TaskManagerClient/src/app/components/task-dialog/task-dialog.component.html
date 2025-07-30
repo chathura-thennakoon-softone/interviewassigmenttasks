@@ -1,0 +1,90 @@
+<div class="task-dialog">
+  <h2 mat-dialog-title>
+    <mat-icon>{{ isNew ? 'edit' : 'add' }}</mat-icon>
+    {{ isNew ? 'Edit Task' : 'Create New Task' }}
+  </h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="taskForm" class="task-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" required placeholder="Enter task title">
+        <mat-error *ngIf="taskForm.get('title')?.hasError('required')">
+          Title is required
+        </mat-error>
+        <mat-error *ngIf="taskForm.get('title')?.hasError('maxlength')">
+          Title must be less than 200 characters
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput 
+                  formControlName="description" 
+                  rows="4" 
+                  placeholder="Enter task description (optional)">
+        </textarea>
+        <mat-error *ngIf="taskForm.get('description')?.hasError('maxlength')">
+          Description must be less than 1000 characters
+        </mat-error>
+      </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Priority</mat-label>
+          <mat-select formControlName="priority">
+            <mat-option [value]="TaskPriority.Low">
+              <span class="priority-option low">{{ getPriorityLabel(TaskPriority.Low) }}</span>
+            </mat-option>
+            <mat-option [value]="TaskPriority.Medium">
+              <span class="priority-option medium">{{ getPriorityLabel(TaskPriority.Medium) }}</span>
+            </mat-option>
+            <mat-option [value]="TaskPriority.High">
+              <span class="priority-option high">{{ getPriorityLabel(TaskPriority.High) }}</span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" *ngIf="isNew">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="isCompleted">
+            <mat-option [value]="false">
+              <span class="status-option active">Active</span>
+            </mat-option>
+            <mat-option [value]="true">
+              <span class="status-option completed">Completed</span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Due Date (Optional)</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="dueDate">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Due Time (Optional)</mat-label>
+          <input matInput type="time" formControlName="dueTime">
+          <mat-icon matSuffix>schedule</mat-icon>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="onCancel()" [disabled]="isLoading">
+      Cancel
+    </button>
+    <button mat-raised-button 
+            color="primary" 
+            (click)="onSave()" 
+            [disabled]="taskForm.invalid || isLoading">
+      <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+      <span *ngIf="!isLoading">{{ isNew ? 'Update' : 'Create' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>
